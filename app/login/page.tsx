@@ -9,8 +9,8 @@ export default function LoginPage() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [message, setMessage] = useState("");
+    const [msgStatus, setMsgStatus] = useState<"success" | "error">("success");
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,12 +26,16 @@ export default function LoginPage() {
                 "userEmail",
                 email
             );
+            setMessage("Login successful!");
+            setMsgStatus("success");
 
             router.push("/dashboard");
 
+
         } catch (error: any) {
 
-            setMessage("Login failed");
+            setMessage("Login failed ~ " + error.response?.data?.error || error.message);
+            setMsgStatus("error");
 
         }
     };
@@ -79,7 +83,7 @@ export default function LoginPage() {
 
                 </form>
 
-                <p className="text-center mt-4 text-green-600">
+                <p className={`text-center mt-4 ${msgStatus === "success" ? "text-green-600" : "text-red-600"}`}>
                     {message}
                 </p>
 

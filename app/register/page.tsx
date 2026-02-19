@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [msgStatus, setMsgStatus] = useState<"success" | "error">("success");
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,13 +18,14 @@ export default function RegisterPage() {
         try {
             await registerUser({ email, password });
             setMessage("Registration successful!");
-
+            setMsgStatus("success");
             setTimeout(() => {
                 router.push("/login");
             }, 1000);
 
         } catch (error: any) {
-            setMessage("Registration failed");
+            setMessage("Registration failed ~ " + error.response?.data?.error || error.message);
+            setMsgStatus("error");
         }
     };
 
@@ -61,14 +63,14 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition cursor-pointer hover:bg-gray-50 transition"
+                        className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
                     >
                         Register
                     </button>
 
                 </form>
 
-                <p className="text-center mt-4 text-green-600">
+                <p className={`text-center mt-4 ${msgStatus === "success" ? "text-green-600" : "text-red-600"}`}>
                     {message}
                 </p>
 

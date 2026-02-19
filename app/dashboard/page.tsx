@@ -17,6 +17,8 @@ export default function DashboardPage() {
 
     const router = useRouter();
 
+    const limit = 6;
+
     const [tasks, setTasks] = useState<any[]>([]);
 
     const [title, setTitle] = useState("");
@@ -39,7 +41,12 @@ export default function DashboardPage() {
     const [showToast, setShowToast] =
         useState(false);
 
-    const limit = 6;
+    // NEW states for assignment requirement
+    const [searchText, setSearchText] =
+        useState("");
+
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
 
 
@@ -57,7 +64,7 @@ export default function DashboardPage() {
 
 
 
-    // Load tasks with pagination fix
+    // Load tasks with pagination + filter + search
     const loadTasks = async () => {
 
         try {
@@ -65,11 +72,15 @@ export default function DashboardPage() {
             setLoading(true);
 
             const data =
-                await getTasks(page, limit);
+                await getTasks(
+                    page,
+                    limit,
+                    statusFilter,
+                    searchText
+                );
 
             setTasks(data);
 
-            // Stop next button if no more data
             setHasMore(data.length === limit);
 
         } catch {
@@ -89,7 +100,7 @@ export default function DashboardPage() {
 
         loadTasks();
 
-    }, [page]);
+    }, [page, searchText, statusFilter]);
 
 
 
@@ -109,15 +120,9 @@ export default function DashboardPage() {
 
 
 
-    const handleUpdate = async (
-        id: number
-    ) => {
+    const handleUpdate = async (id: number) => {
 
-        await updateTask(
-            id,
-            title,
-            description
-        );
+        await updateTask(id, title, description);
 
         setEditingId(null);
 
@@ -131,9 +136,7 @@ export default function DashboardPage() {
 
 
 
-    const handleDelete = async (
-        id: number
-    ) => {
+    const handleDelete = async (id: number) => {
 
         await deleteTask(id);
 
@@ -144,9 +147,7 @@ export default function DashboardPage() {
 
 
 
-    const handleToggle = async (
-        id: number
-    ) => {
+    const handleToggle = async (id: number) => {
 
         await toggleTask(id);
 
@@ -189,11 +190,54 @@ export default function DashboardPage() {
 
 
 
+            {/* Search and Filter */}
+
+            <div className="flex flex-wrap gap-4 mb-6">
+
+                <input
+                    placeholder="Search by title..."
+                    value={searchText}
+                    onChange={(e) => {
+                        setSearchText(e.target.value);
+                        setPage(1);
+                    }}
+                    className="border p-2 rounded w-60"
+                />
+
+
+
+                <select
+                    value={statusFilter}
+                    onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setPage(1);
+                    }}
+                    className="border p-2 rounded"
+                >
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option value="TODO">
+                        TODO
+                    </option>
+
+                    <option value="DONE">
+                        DONE
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
             {/* Create / Update Card */}
 
             <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="bg-white p-6 rounded-xl shadow-lg mb-8"
             >
 
@@ -223,9 +267,7 @@ export default function DashboardPage() {
                     placeholder="Description"
                     value={description}
                     onChange={(e) =>
-                        setDescription(
-                            e.target.value
-                        )
+                        setDescription(e.target.value)
                     }
                 />
 
@@ -242,7 +284,7 @@ export default function DashboardPage() {
                                     )
                                 : handleCreate
                         }
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 cursor-pointer"
+                        className="bg-blue-600 text-white px-6 py-2 rounded"
                     >
 
                         {editingId
@@ -256,10 +298,8 @@ export default function DashboardPage() {
                     {editingId && (
 
                         <button
-                            onClick={
-                                handleCancelEdit
-                            }
-                            className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 cursor-pointer"
+                            onClick={handleCancelEdit}
+                            className="bg-gray-400 text-white px-4 py-2 rounded"
                         >
                             Cancel
                         </button>
@@ -276,132 +316,98 @@ export default function DashboardPage() {
 
             {loading ? (
 
-                <div className="text-center text-gray-500">
+                <div className="text-center">
                     Loading tasks...
                 </div>
 
             ) : tasks.length === 0 ? (
 
-                /* No data */
-
                 <motion.div
-
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-
-                    className="bg-white p-10 rounded-xl shadow-lg text-center"
+                    className="bg-white p-10 rounded-xl shadow text-center"
                 >
 
-                    <div className="text-6xl mb-4">
+                    <div className="text-6xl">
                         📭
                     </div>
 
-                    <h3 className="text-xl font-semibold">
+                    <h3 className="text-xl">
                         No Tasks Available
                     </h3>
-
-                    <p className="text-gray-500">
-                        Create your first task
-                    </p>
 
                 </motion.div>
 
             ) : (
 
-                /* Task Grid */
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                    <AnimatePresence>
+                    {tasks.map((task) => (
 
-                        {tasks.map((task) => (
+                        <motion.div
+                            key={task.id}
+                            whileHover={{
+                                scale: 1.05,
+                            }}
+                            className="bg-white p-5 rounded-xl shadow"
+                        >
 
-                            <motion.div
+                            <h3 className="font-semibold">
+                                {task.title}
+                            </h3>
 
-                                key={task.id}
+                            <p>
+                                {task.description}
+                            </p>
 
-                                initial={{
-                                    opacity: 0,
-                                    scale: 0.8,
-                                }}
-
-                                animate={{
-                                    opacity: 1,
-                                    scale: 1,
-                                }}
-
-                                exit={{
-                                    opacity: 0,
-                                    scale: 0.5,
-                                }}
-
-                                whileHover={{
-                                    scale: 1.03,
-                                }}
-
-                                className="bg-white p-5 rounded-xl shadow-lg"
-                            >
-
-                                <h3 className="font-semibold text-lg">
-                                    {task.title}
-                                </h3>
-
-                                <p className="text-gray-600">
-                                    {task.description}
-                                </p>
-
-                                <span className={`inline-block mt-2 px-3 py-1 rounded-full ${
-                                    task.status === "DONE"
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
-                                }`}>
-
-                                    {task.status}
-
-                                </span>
+                            <span className={`inline-block mt-2 px-3 py-1 rounded ${
+                                task.status === "DONE"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                            }`}>
+                                {task.status}
+                            </span>
 
 
 
-                                <div className="flex gap-2 mt-4">
+                            <div className="flex gap-2 mt-3">
 
-                                    <button
-                                        onClick={() =>
-                                            handleToggle(task.id)
-                                        }
-                                        className="bg-yellow-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Toggle
-                                    </button>
-
-
-
-                                    <button
-                                        onClick={() =>
-                                            handleEditClick(task)
-                                        }
-                                        className="bg-blue-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Edit
-                                    </button>
+                                <button
+                                    onClick={() =>
+                                        handleToggle(task.id)
+                                    }
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Toggle
+                                </button>
 
 
 
-                                    <button
-                                        onClick={() =>
-                                            handleDelete(task.id)
-                                        }
-                                        className="bg-red-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Delete
-                                    </button>
+                                <button
+                                    onClick={() =>
+                                        handleEditClick(task)
+                                    }
+                                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
 
-                                </div>
 
-                            </motion.div>
 
-                        ))}
+                                <button
+                                    onClick={() =>
+                                        handleDelete(task.id)
+                                    }
+                                    className="bg-red-500 text-white px-3 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
 
-                    </AnimatePresence>
+                            </div>
+
+                        </motion.div>
+
+                    ))}
 
                 </div>
 
@@ -441,42 +447,36 @@ export default function DashboardPage() {
 
 
 
-            {/* BOOM Success Toast */}
+            {/* Success Toast */}
 
             <AnimatePresence>
 
                 {showToast && (
 
                     <motion.div
-
                         initial={{
                             opacity: 0,
                             scale: 0.3,
                         }}
-
                         animate={{
                             opacity: 1,
                             scale: [0.3, 1.4, 1],
                         }}
-
                         exit={{
                             opacity: 0,
                             scale: 0.3,
                         }}
-
                         className="fixed top-1/2 left-1/2 transform
                         -translate-x-1/2 -translate-y-1/2
-                        bg-green-500 text-white px-10 py-6
-                        rounded-2xl shadow-2xl
-                        text-center"
+                        bg-green-500 text-white px-10 py-6 rounded-xl"
                     >
 
-                        <div className="text-6xl">
+                        <div className="text-5xl">
                             👍
                         </div>
 
-                        <div className="text-2xl font-bold">
-                            BOOM! 🎉
+                        <div className="text-xl font-bold">
+                            BOOM!
                         </div>
 
                         <div>
@@ -492,4 +492,5 @@ export default function DashboardPage() {
         </div>
 
     );
+
 }
