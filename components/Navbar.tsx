@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GoMoveToEnd } from "react-icons/go";
-
+import { motion } from "framer-motion";
 
 export default function Navbar() {
 
@@ -29,9 +29,11 @@ export default function Navbar() {
     setIsLoggedIn(!!token);
 
     if (email) {
+
       setUserInitial(
         email.charAt(0).toUpperCase()
       );
+
     }
 
   }, [pathname]);
@@ -54,16 +56,40 @@ export default function Navbar() {
 
   return (
 
-    <nav className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm">
+    <nav
+      className="
+        sticky top-0 z-50
+        backdrop-blur-md
+        bg-white/80 dark:bg-gray-900/80
+        border-b border-gray-200 dark:border-red-800
+        px-6 py-3
+        flex justify-between items-center
+        transition-colors duration-300
+      "
+    >
 
       {/* Logo */}
 
-      <div
-        className="text-xl font-bold text-blue-600 cursor-pointer"
+      <motion.div
+
+        whileHover={{ scale: 1.05 }}
+
+        whileTap={{ scale: 0.95 }}
+
         onClick={() => router.push("/dashboard")}
+
+        className="
+          text-xl font-bold
+          bg-gradient-to-r from-blue-500 to-green-400
+          bg-clip-text text-transparent
+          cursor-pointer
+        "
+
       >
+
         Task Manager
-      </div>
+
+      </motion.div>
 
 
 
@@ -74,57 +100,111 @@ export default function Navbar() {
         {!isLoggedIn ? (
 
           <>
-            <button
-              onClick={() =>
-                router.push("/login")
-              }
-              className="text-gray-700 hover:text-blue-600 font-medium"
-            >
-              Login
-            </button>
+
+            {/* Login */}
 
             <button
-              onClick={() =>
-                router.push("/register")
-              }
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+
+              onClick={() => router.push("/login")}
+
+              className="
+                text-gray-700 dark:text-gray-300
+                hover:text-blue-600 dark:hover:text-blue-400
+                font-medium
+                transition
+                cursor-pointer
+              "
+
             >
-              Register
+
+              Login
+
             </button>
+
+
+
+            {/* Register */}
+
+            <button
+
+              onClick={() => router.push("/register")}
+
+              className="
+                bg-gradient-to-r from-blue-600 to-indigo-600
+                hover:from-blue-700 hover:to-indigo-700
+                text-white
+                px-4 py-2
+                rounded-lg
+                shadow-md
+                hover:shadow-lg
+                transition-all duration-200
+                cursor-pointer
+              "
+
+            >
+
+              Register
+
+            </button>
+
           </>
 
         ) : (
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
 
             {/* Avatar */}
 
-            <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
+            <motion.div
+
+              whileHover={{ scale: 1.1 }}
+
+              className="
+                w-10 h-10 rounded-full
+                bg-gradient-to-r from-blue-600 to-indigo-600
+                text-white
+                flex items-center justify-center
+                font-semibold
+                shadow-md
+              "
+
+            >
 
               {userInitial || "U"}
 
-            </div>
+            </motion.div>
 
 
 
-            {/* Sign out */}
+            {/* Logout */}
 
-            <button
+            <motion.button
+
+              whileHover={{ x: 3 }}
+
+              whileTap={{ scale: 0.95 }}
+
               onClick={handleLogout}
-              className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition group cursor-pointer"
+
+              className="
+                flex items-center gap-2
+                text-gray-600 dark:text-gray-300
+                hover:text-red-600 dark:hover:text-red-400
+                transition
+                cursor-pointer
+              "
+
             >
 
-              <GoMoveToEnd
-                size={20}
-                className="group-hover:translate-x-1 transition"
-              />
+              <GoMoveToEnd size={20} />
 
               <span className="text-sm font-medium">
-                sign out
+
+                Sign out
+
               </span>
 
-            </button>
-
+            </motion.button>
 
           </div>
 

@@ -55,7 +55,6 @@ export default function DashboardPage() {
     const showSuccess = (message: string) => {
 
         setSuccessMessage(message);
-
         setShowToast(true);
 
         setTimeout(() => {
@@ -210,7 +209,15 @@ export default function DashboardPage() {
 
     return (
 
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
+        <div className="
+            min-h-screen
+            bg-gradient-to-br
+            from-gray-100 to-gray-200
+            dark:from-gray-900 dark:to-gray-800
+            text-gray-900 dark:text-gray-100
+            p-8
+            transition-colors duration-300
+        ">
 
             {(loading || actionLoading) && (
                 <Loader fullScreen text="Please wait..." />
@@ -233,7 +240,12 @@ export default function DashboardPage() {
                         setSearchText(e.target.value);
                         setPage(1);
                     }}
-                    className="border p-2 rounded w-60"
+                    className="
+                        border p-2 rounded w-60
+                        bg-white dark:bg-gray-700
+                        text-gray-900 dark:text-gray-100
+                        border-gray-300 dark:border-gray-600
+                    "
                 />
 
 
@@ -244,7 +256,12 @@ export default function DashboardPage() {
                         setStatusFilter(e.target.value);
                         setPage(1);
                     }}
-                    className="border p-2 rounded cursor-pointer"
+                    className="
+                        border p-2 rounded cursor-pointer
+                        bg-white dark:bg-gray-700
+                        text-gray-900 dark:text-gray-100
+                        border-gray-300 dark:border-gray-600
+                    "
                 >
 
                     <option value="">
@@ -270,21 +287,27 @@ export default function DashboardPage() {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white p-6 rounded-xl shadow-lg mb-8"
+                className="
+                    bg-white dark:bg-gray-800
+                    p-6 rounded-xl shadow-lg mb-8
+                "
             >
 
                 <h2 className="text-xl font-semibold mb-4">
-
                     {editingId
                         ? "Update Task"
                         : "Create Task"}
-
                 </h2>
 
 
 
                 <input
-                    className="w-full border p-3 rounded mb-3"
+                    className="
+                        w-full border p-3 rounded mb-3
+                        bg-white dark:bg-gray-700
+                        text-gray-900 dark:text-gray-100
+                        border-gray-300 dark:border-gray-600
+                    "
                     placeholder="Task title"
                     value={title}
                     onChange={(e) =>
@@ -295,7 +318,12 @@ export default function DashboardPage() {
 
 
                 <input
-                    className="w-full border p-3 rounded mb-3"
+                    className="
+                        w-full border p-3 rounded mb-3
+                        bg-white dark:bg-gray-700
+                        text-gray-900 dark:text-gray-100
+                        border-gray-300 dark:border-gray-600
+                    "
                     placeholder="Description"
                     value={description}
                     onChange={(e) =>
@@ -311,13 +339,17 @@ export default function DashboardPage() {
                         onClick={
                             editingId
                                 ? () =>
-                                      handleUpdate(
-                                          editingId
-                                      )
+                                      handleUpdate(editingId)
                                 : handleCreate
                         }
                         disabled={actionLoading}
-                        className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer disabled:opacity-50"
+                        className="
+                            bg-blue-600 hover:bg-blue-700
+                            text-white px-6 py-2 rounded
+                            cursor-pointer
+                            disabled:opacity-50
+                            transition
+                        "
                     >
 
                         {actionLoading
@@ -334,7 +366,12 @@ export default function DashboardPage() {
 
                         <button
                             onClick={handleCancelEdit}
-                            className="bg-gray-400 text-white px-4 py-2 rounded cursor-pointer"
+                            className="
+                                bg-gray-400 hover:bg-gray-500
+                                text-white px-4 py-2 rounded
+                                cursor-pointer
+                                transition
+                            "
                         >
                             Cancel
                         </button>
@@ -354,7 +391,10 @@ export default function DashboardPage() {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="bg-white p-10 rounded-xl shadow text-center"
+                    className="
+                        bg-white dark:bg-gray-800
+                        p-10 rounded-xl shadow text-center
+                    "
                 >
 
                     <div className="text-6xl">
@@ -376,7 +416,10 @@ export default function DashboardPage() {
                         <motion.div
                             key={task.id}
                             whileHover={{ scale: 1.05 }}
-                            className="bg-white p-5 rounded-xl shadow"
+                            className="
+                                bg-white dark:bg-gray-800
+                                p-5 rounded-xl shadow
+                            "
                         >
 
                             <h3 className="font-semibold">
@@ -390,8 +433,8 @@ export default function DashboardPage() {
                             <span
                                 className={`inline-block mt-2 px-3 py-1 rounded ${
                                     task.status === "DONE"
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
+                                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                                        : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
                                 }`}
                             >
                                 {task.status}
@@ -405,7 +448,11 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleToggle(task.id)
                                     }
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded cursor-pointer"
+                                    className="
+                                        bg-yellow-500 hover:bg-yellow-600
+                                        text-white px-3 py-1 rounded
+                                        cursor-pointer transition
+                                    "
                                 >
                                     Toggle
                                 </button>
@@ -416,7 +463,11 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleEditClick(task)
                                     }
-                                    className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer"
+                                    className="
+                                        bg-blue-500 hover:bg-blue-600
+                                        text-white px-3 py-1 rounded
+                                        cursor-pointer transition
+                                    "
                                 >
                                     Edit
                                 </button>
@@ -427,7 +478,11 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleDelete(task.id)
                                     }
-                                    className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
+                                    className="
+                                        bg-red-500 hover:bg-red-600
+                                        text-white px-3 py-1 rounded
+                                        cursor-pointer transition
+                                    "
                                 >
                                     Delete
                                 </button>
@@ -451,21 +506,18 @@ export default function DashboardPage() {
                 {showToast && (
 
                     <motion.div
-                        initial={{
-                            opacity: 0,
-                            scale: 0.3,
-                        }}
+                        initial={{ opacity: 0, scale: 0.3 }}
                         animate={{
                             opacity: 1,
                             scale: [0.3, 1.4, 1],
                         }}
-                        exit={{
-                            opacity: 0,
-                            scale: 0.3,
-                        }}
-                        className="fixed top-1/2 left-1/2 transform
-                        -translate-x-1/2 -translate-y-1/2
-                        bg-green-500 text-white px-10 py-6 rounded-xl"
+                        exit={{ opacity: 0, scale: 0.3 }}
+                        className="
+                            fixed top-1/2 left-1/2 transform
+                            -translate-x-1/2 -translate-y-1/2
+                            bg-green-500 text-white
+                            px-10 py-6 rounded-xl
+                        "
                     >
 
                         <div className="text-5xl">
