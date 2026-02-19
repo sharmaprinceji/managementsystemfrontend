@@ -284,7 +284,7 @@ export default function DashboardPage() {
                                     )
                                 : handleCreate
                         }
-                        className="bg-blue-600 text-white px-6 py-2 rounded"
+                        className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer"
                     >
 
                         {editingId
@@ -299,7 +299,7 @@ export default function DashboardPage() {
 
                         <button
                             onClick={handleCancelEdit}
-                            className="bg-gray-400 text-white px-4 py-2 rounded"
+                            className="bg-gray-400 text-white px-4 py-2 rounded cursor-pointer"
                         >
                             Cancel
                         </button>
@@ -376,7 +376,7 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleToggle(task.id)
                                     }
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded cursor-pointer"
                                 >
                                     Toggle
                                 </button>
@@ -387,7 +387,7 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleEditClick(task)
                                     }
-                                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                                    className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer"
                                 >
                                     Edit
                                 </button>
@@ -398,7 +398,7 @@ export default function DashboardPage() {
                                     onClick={() =>
                                         handleDelete(task.id)
                                     }
-                                    className="bg-red-500 text-white px-3 py-1 rounded"
+                                    className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
                                 >
                                     Delete
                                 </button>
@@ -424,7 +424,7 @@ export default function DashboardPage() {
                     onClick={() =>
                         setPage(page - 1)
                     }
-                    className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+                    className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50 cursor-pointer"
                 >
                     Prev
                 </button>

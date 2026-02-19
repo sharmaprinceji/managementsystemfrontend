@@ -1,17 +1,5 @@
 import api from "@/lib/axios";
 
-// export const getTasks = async (
-//     page = 1,
-//     limit = 6
-// ) => {
-
-//     const res = await api.get(
-//         `/tasks?page=${page}&limit=${limit}`
-//     );
-
-//     return res.data;
-// };
-
 export const getTasks = async (
     page = 1,
     limit = 6,
