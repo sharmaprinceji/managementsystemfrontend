@@ -3,16 +3,28 @@
 import { useState } from "react";
 import { loginUser } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 
 export default function LoginPage() {
+
     const router = useRouter();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [msgStatus, setMsgStatus] = useState<"success" | "error">("success");
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const [message, setMessage] = useState("");
+    const [msgStatus, setMsgStatus] =
+        useState<"success" | "error">("success");
+
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async (
+        e: React.FormEvent
+    ) => {
+
         e.preventDefault();
+
+        setLoading(true);
 
         try {
 
@@ -25,23 +37,37 @@ export default function LoginPage() {
                 "userEmail",
                 email
             );
+
             setMessage("Login successful!");
             setMsgStatus("success");
 
             router.push("/dashboard");
 
-
         } catch (error: any) {
 
-            setMessage("Login failed ~ " + error.response?.data?.error || error.message);
+            setMessage(
+                "Login failed ~ " +
+                (
+                    error.response?.data?.error ||
+                    error.message
+                )
+            );
+
             setMsgStatus("error");
+
+        } finally {
+
+            setLoading(false);
 
         }
     };
 
-
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
+
+            {loading && (
+                <Loader fullScreen text="Logging in..." />
+            )}
 
             <div className="bg-white p-8 rounded-xl shadow-md w-96">
 
@@ -49,7 +75,10 @@ export default function LoginPage() {
                     Login
                 </h2>
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form
+                    onSubmit={handleLogin}
+                    className="space-y-4"
+                >
 
                     <input
                         type="email"
@@ -58,7 +87,7 @@ export default function LoginPage() {
                         onChange={(e) =>
                             setEmail(e.target.value)
                         }
-                        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border rounded-lg"
                         required
                     />
 
@@ -69,20 +98,31 @@ export default function LoginPage() {
                         onChange={(e) =>
                             setPassword(e.target.value)
                         }
-                        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border rounded-lg"
                         required
                     />
 
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition cursor-pointer hover:bg-gray-50 transition"
+                        disabled={loading}
+                        className="w-full bg-green-600 text-white p-3 rounded-lg"
                     >
-                        Login
+
+                        {loading
+                            ? "Logging in..."
+                            : "Login"}
+
                     </button>
 
                 </form>
 
-                <p className={`text-center mt-4 ${msgStatus === "success" ? "text-green-600" : "text-red-600"}`}>
+                <p
+                    className={`text-center mt-4 ${
+                        msgStatus === "success"
+                            ? "text-green-600"
+                            : "text-red-600"
+                    }`}
+                >
                     {message}
                 </p>
 
@@ -90,5 +130,4 @@ export default function LoginPage() {
 
         </div>
     );
-
 }

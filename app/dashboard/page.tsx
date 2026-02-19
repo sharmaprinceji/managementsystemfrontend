@@ -12,6 +12,7 @@ import {
 } from "@/services/task.service";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Loader from "@/components/Loader";
 
 export default function DashboardPage() {
 
@@ -20,7 +21,6 @@ export default function DashboardPage() {
     const limit = 6;
 
     const [tasks, setTasks] = useState<any[]>([]);
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
 
@@ -35,13 +35,15 @@ export default function DashboardPage() {
     const [loading, setLoading] =
         useState(true);
 
+    const [actionLoading, setActionLoading] =
+        useState(false);
+
     const [successMessage, setSuccessMessage] =
         useState("");
 
     const [showToast, setShowToast] =
         useState(false);
 
-    // NEW states for assignment requirement
     const [searchText, setSearchText] =
         useState("");
 
@@ -50,7 +52,6 @@ export default function DashboardPage() {
 
 
 
-    // Success animation
     const showSuccess = (message: string) => {
 
         setSuccessMessage(message);
@@ -58,18 +59,20 @@ export default function DashboardPage() {
         setShowToast(true);
 
         setTimeout(() => {
+
             setShowToast(false);
+
         }, 2000);
+
     };
 
 
 
-    // Load tasks with pagination + filter + search
     const loadTasks = async () => {
 
-        try {
+        setLoading(true);
 
-            setLoading(true);
+        try {
 
             const data =
                 await getTasks(
@@ -81,7 +84,9 @@ export default function DashboardPage() {
 
             setTasks(data);
 
-            setHasMore(data.length === limit);
+            setHasMore(
+                data.length === limit
+            );
 
         } catch {
 
@@ -92,6 +97,7 @@ export default function DashboardPage() {
             setLoading(false);
 
         }
+
     };
 
 
@@ -108,6 +114,8 @@ export default function DashboardPage() {
 
         if (!title) return;
 
+        setActionLoading(true);
+
         await createTask(title, description);
 
         setTitle("");
@@ -115,12 +123,17 @@ export default function DashboardPage() {
 
         showSuccess("Task created successfully");
 
-        loadTasks();
+        await loadTasks();
+
+        setActionLoading(false);
+
     };
 
 
 
     const handleUpdate = async (id: number) => {
+
+        setActionLoading(true);
 
         await updateTask(id, title, description);
 
@@ -131,29 +144,42 @@ export default function DashboardPage() {
 
         showSuccess("Task updated successfully");
 
-        loadTasks();
+        await loadTasks();
+
+        setActionLoading(false);
+
     };
 
 
 
     const handleDelete = async (id: number) => {
 
+        setActionLoading(true);
+
         await deleteTask(id);
 
         showSuccess("Task deleted");
 
-        loadTasks();
+        await loadTasks();
+
+        setActionLoading(false);
+
     };
 
 
 
     const handleToggle = async (id: number) => {
 
+        setActionLoading(true);
+
         await toggleTask(id);
 
         showSuccess("Task status updated");
 
-        loadTasks();
+        await loadTasks();
+
+        setActionLoading(false);
+
     };
 
 
@@ -165,6 +191,7 @@ export default function DashboardPage() {
         setTitle(task.title);
 
         setDescription(task.description);
+
     };
 
 
@@ -176,6 +203,7 @@ export default function DashboardPage() {
         setTitle("");
 
         setDescription("");
+
     };
 
 
@@ -184,13 +212,17 @@ export default function DashboardPage() {
 
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
 
+            {(loading || actionLoading) && (
+                <Loader fullScreen text="Please wait..." />
+            )}
+
             <h1 className="text-3xl font-bold mb-6">
                 Task Dashboard
             </h1>
 
 
 
-            {/* Search and Filter */}
+            {/* Search + Filter */}
 
             <div className="flex flex-wrap gap-4 mb-6">
 
@@ -212,7 +244,7 @@ export default function DashboardPage() {
                         setStatusFilter(e.target.value);
                         setPage(1);
                     }}
-                    className="border p-2 rounded"
+                    className="border p-2 rounded cursor-pointer"
                 >
 
                     <option value="">
@@ -279,15 +311,18 @@ export default function DashboardPage() {
                         onClick={
                             editingId
                                 ? () =>
-                                    handleUpdate(
-                                        editingId
-                                    )
+                                      handleUpdate(
+                                          editingId
+                                      )
                                 : handleCreate
                         }
-                        className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer"
+                        disabled={actionLoading}
+                        className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer disabled:opacity-50"
                     >
 
-                        {editingId
+                        {actionLoading
+                            ? "Processing..."
+                            : editingId
                             ? "Update Task"
                             : "Create Task"}
 
@@ -312,15 +347,9 @@ export default function DashboardPage() {
 
 
 
-            {/* Loading */}
+            {/* Tasks Grid */}
 
-            {loading ? (
-
-                <div className="text-center">
-                    Loading tasks...
-                </div>
-
-            ) : tasks.length === 0 ? (
+            {tasks.length === 0 && !loading ? (
 
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -346,9 +375,7 @@ export default function DashboardPage() {
 
                         <motion.div
                             key={task.id}
-                            whileHover={{
-                                scale: 1.05,
-                            }}
+                            whileHover={{ scale: 1.05 }}
                             className="bg-white p-5 rounded-xl shadow"
                         >
 
@@ -360,11 +387,13 @@ export default function DashboardPage() {
                                 {task.description}
                             </p>
 
-                            <span className={`inline-block mt-2 px-3 py-1 rounded ${
-                                task.status === "DONE"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-yellow-100 text-yellow-700"
-                            }`}>
+                            <span
+                                className={`inline-block mt-2 px-3 py-1 rounded ${
+                                    task.status === "DONE"
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-yellow-100 text-yellow-700"
+                                }`}
+                            >
                                 {task.status}
                             </span>
 
@@ -412,38 +441,6 @@ export default function DashboardPage() {
                 </div>
 
             )}
-
-
-
-            {/* Pagination */}
-
-            <div className="flex justify-center mt-8 gap-4">
-
-                <button
-                    disabled={page === 1}
-                    onClick={() =>
-                        setPage(page - 1)
-                    }
-                    className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50 cursor-pointer"
-                >
-                    Prev
-                </button>
-
-                <span>
-                    Page {page}
-                </span>
-
-                <button
-                    disabled={!hasMore}
-                    onClick={() =>
-                        setPage(page + 1)
-                    }
-                    className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
-                >
-                    Next
-                </button>
-
-            </div>
 
 
 
